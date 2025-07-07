@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QTextCursor, QFont, QColor, QTextCharFormat
 from PyQt5.QtCore import Qt
 import ollama
+from PyQt5.QtGui import QIcon
 
 MODEL = "mistral"
 
@@ -24,52 +25,77 @@ class AdventureApp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Infinite Adventure")
-        self.resize(800, 600)
+        self.setWindowIcon(QIcon("adventure_icon.png"))
+        self.resize(850, 600)
 
-        self.font_family = "Consolas"
-        self.text_fg = QColor("#dddddd")
-        self.player_fg = QColor("#6A9955")
+        self.font_family = "Segoe UI"
+        self.text_fg = QColor("#E1E1E1")
+        self.player_fg = QColor("#4CAF50")
         self.bg_color = "#1e1e1e"
+
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {self.bg_color};
+            }}
+        """)
 
         # Main layout
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
         self.setLayout(layout)
+
+        # Title label
+        self.title_label = QLabel("Infinite Adventure")
+        self.title_label.setFont(QFont(self.font_family, 20, QFont.Bold))
+        self.title_label.setStyleSheet("color: #F0F0F0;")
+        layout.addWidget(self.title_label)
 
         # Story display
         self.story_area = QTextEdit()
         self.story_area.setReadOnly(True)
-        self.story_area.setFont(QFont(self.font_family, 12))
+        self.story_area.setFont(QFont(self.font_family, 13))
         self.story_area.setStyleSheet(f"""
-            background-color: #252526;
-            color: {self.text_fg.name()};
-            border: none;
-            padding: 10px;
+            QTextEdit {{
+                background-color: #2A2D2E;
+                color: {self.text_fg.name()};
+                border: 1px solid #3A3A3A;
+                border-radius: 8px;
+                padding: 10px;
+            }}
         """)
         layout.addWidget(self.story_area)
 
         # Input row
         input_row = QHBoxLayout()
+        input_row.setSpacing(10)
 
         self.input_entry = QLineEdit()
         self.input_entry.setFont(QFont(self.font_family, 12))
         self.input_entry.setStyleSheet("""
-            background-color: #2d2d30;
-            color: #dddddd;
-            border: none;
-            padding: 6px;
+            QLineEdit {
+                background-color: #3A3D3E;
+                color: #EEEEEE;
+                border: 1px solid #555555;
+                border-radius: 6px;
+                padding: 8px;
+            }
         """)
         input_row.addWidget(self.input_entry)
 
         self.submit_button = QPushButton("Submit")
-        self.submit_button.setFont(QFont(self.font_family, 12))
+        self.submit_button.setFont(QFont(self.font_family, 11))
+        self.submit_button.setCursor(Qt.PointingHandCursor)
         self.submit_button.setStyleSheet("""
             QPushButton {
-                background-color: #0e639c;
+                background-color: #007ACC;
                 color: white;
-                padding: 6px;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 16px;
             }
             QPushButton:hover {
-                background-color: #1177bb;
+                background-color: #2494E6;
             }
         """)
         self.submit_button.clicked.connect(self.on_submit)
@@ -77,37 +103,47 @@ class AdventureApp(QWidget):
 
         layout.addLayout(input_row)
 
-        # Start button
+        # Control buttons row
+        control_row = QHBoxLayout()
+        control_row.setSpacing(10)
+
         self.start_button = QPushButton("Start Game")
-        self.start_button.setFont(QFont(self.font_family, 12, QFont.Bold))
+        self.start_button.setFont(QFont(self.font_family, 11, QFont.Bold))
+        self.start_button.setCursor(Qt.PointingHandCursor)
         self.start_button.setStyleSheet("""
             QPushButton {
-                background-color: #388a34;
+                background-color: #4CAF50;
                 color: white;
-                padding: 6px;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 16px;
             }
             QPushButton:hover {
-                background-color: #4caf50;
+                background-color: #66BB6A;
             }
         """)
         self.start_button.clicked.connect(self.start_game)
-        layout.addWidget(self.start_button)
+        control_row.addWidget(self.start_button)
 
-        # Export button
         self.export_button = QPushButton("Export Transcript")
-        self.export_button.setFont(QFont(self.font_family, 10))
+        self.export_button.setFont(QFont(self.font_family, 11))
+        self.export_button.setCursor(Qt.PointingHandCursor)
         self.export_button.setStyleSheet("""
             QPushButton {
                 background-color: #555555;
                 color: white;
-                padding: 4px;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 16px;
             }
             QPushButton:hover {
                 background-color: #777777;
             }
         """)
         self.export_button.clicked.connect(self.export_transcript)
-        layout.addWidget(self.export_button)
+        control_row.addWidget(self.export_button)
+
+        layout.addLayout(control_row)
 
         # Game state
         self.history = []
